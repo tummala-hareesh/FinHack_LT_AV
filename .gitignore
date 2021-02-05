@@ -1,3 +1,6 @@
 Xtras/
 sample_submission.csv
-data/*
+data_raw/*
+py3-finhack/*
+Notes_PyCaret*
+
