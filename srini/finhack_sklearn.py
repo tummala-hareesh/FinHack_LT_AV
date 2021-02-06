@@ -13,6 +13,13 @@ from sklearn.metrics import classification_report
 # Functions
 
 def handle_non_numerical_data(df):
+    """
+    This function to handle for non-numerical data. First, cycle through the
+    columns in the Pandas dataframe. For columns that are not numbers,
+    find their unique elements. This can be done by simply take a set of the
+    column values. From here, the index within that set can be the new
+    "numerical" value or "id" of the text data.
+    """
     columns = df.columns.values
     for column in columns:
         text_digit_vals = {}
