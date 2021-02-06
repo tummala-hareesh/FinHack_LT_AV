@@ -42,14 +42,6 @@ def handle_non_numerical_data(df):
 
     return df, data_dict
 
-# Mapping data
-def handle_non_numerical_data_test(df, data_dict):
-    temp = list(data_dict.keys())
-    for column in temp:
-        if column in df.keys():
-            df[column] = df[column].replace(list(data_dict[column].keys()),list(data_dict[column].values))
-    return df
-
 ## Check modules version
 print('Notebook running from:',sys.executable)
 print('Pandas:',pd.__version__)
@@ -115,8 +107,14 @@ print(df_customer_test.shape)
 df_customer_test = df_customer_test.drop(data_drop_list, axis=1)
 
 # Convert non-numeric to unique numerical values
-df_customer_test = handle_non_numerical_data_test(df_customer_test, column_mapped_dict)
-#predictions_test = clf.predict(df_customer_test)
+for key in list(column_mapped_dict.keys()):
+    print(key)
+    if key in list(df_customer_test.keys()):
+        print(column_mapped_dict[key].keys())
+        print(column_mapped_dict[key].values())
+        df_customer_test[key] = df_customer_test[key].replace(list(column_mapped_dict[key].keys()),list(column_mapped_dict[key].values()))
+
+predictions_test = clf.predict(df_customer_test)
 
 """
 
