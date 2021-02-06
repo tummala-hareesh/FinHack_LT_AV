@@ -20,6 +20,7 @@ def handle_non_numerical_data(df):
     column values. From here, the index within that set can be the new
     "numerical" value or "id" of the text data.
     """
+    data_dict = {}
     columns = df.columns.values
     for column in columns:
         text_digit_vals = {}
@@ -36,12 +37,18 @@ def handle_non_numerical_data(df):
                     x+=1
 
             df[column] = list(map(convert_to_int, df[column]))
-            if column == 'Top-up Month':
-                print(text_digit_vals)
-                target_column_dict = text_digit_vals
+            #print(text_digit_vals)
+            data_dict[column] = text_digit_vals
 
-    return df, target_column_dict
+    return df, data_dict
 
+# Mapping data
+def handle_non_numerical_data_test(df, data_dict):
+    temp = list(data_dict.keys())
+    for column in temp:
+        if column in df.keys():
+            df[column] = df[column].replace(list(data_dict[column].keys()),list(data_dict[column].values))
+    return df
 
 ## Check modules version
 print('Notebook running from:',sys.executable)
@@ -49,7 +56,6 @@ print('Pandas:',pd.__version__)
 
 ## List data-raw
 path_pwd = os.getcwd()
-#path_pwd = path_pwd.replace('/srini','')
 path_data_train = path_pwd+'/'+'data_raw/train/'
 os.listdir(path_data_train)
 
@@ -72,8 +78,8 @@ data_drop_list  = ['BranchID', 'Area', 'DisbursalDate', 'MaturityDAte','AuthDate
 df_customer = df_customer.drop(data_drop_list, axis=1)
 
 # Convert non-numeric to unique numerical values
-df_customer, target_column_dict = handle_non_numerical_data(df_customer)
-print(df_customer.head(20))
+df_customer, column_mapped_dict = handle_non_numerical_data(df_customer)
+print(column_mapped_dict)
 
 # Divide data set into train and test
 data, data_unseen, data_target, data_unseen_target =train_test_split(
@@ -87,6 +93,30 @@ clf = LogisticRegression().fit(data, data_target)
 predictions = clf.predict(data_unseen)
 
 print(classification_report(data_unseen_target, predictions))
+
+# Testing
+path_data_test = path_pwd+'/'+'data_raw/test/'
+os.listdir(path_data_test)
+
+## Set testing data
+file_customer_test = path_data_test+'test_Data.xlsx'
+print('Customer file:', file_customer_test)
+
+
+## Load customer trainig data
+df_customer_test = pd.read_excel(file_customer_test, engine='openpyxl')
+#df_customer_test.head()
+
+# Shape as data loaded
+print(df_customer_test.shape)
+df_customer_test = df_customer_test.dropna() # Drop NaN and missing data rows
+print(df_customer_test.shape)
+
+df_customer_test = df_customer_test.drop(data_drop_list, axis=1)
+
+# Convert non-numeric to unique numerical values
+df_customer_test = handle_non_numerical_data_test(df_customer_test, column_mapped_dict)
+#predictions_test = clf.predict(df_customer_test)
 
 """
 
