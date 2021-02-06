@@ -1,6 +1,7 @@
 Xtras/
-sample_submission.csv
+models_saved/*.pkl
 data_raw/*
 py3-finhack/*
 Notes_PyCaret*
+submission_saved/*.csv
 
