@@ -63,7 +63,7 @@ df_customer.head()
 df_customer = df_customer.dropna() # Drop NaN and missing data rows
 print(df_customer.shape)
 
-data_drop_list  = ['BranchID', 'Area', 'DisbursalDate', 'MaturityDAte','AuthDate',
+data_drop_list  = ['ID','BranchID', 'Area', 'DisbursalDate', 'MaturityDAte','AuthDate',
                 'AssetID', 'ManufacturerID', 'SupplierID',
                 'City', 'State', 'ZiPCODE']
 
@@ -85,7 +85,17 @@ clf = LogisticRegression().fit(data, data_target)
 predictions = clf.predict(data_unseen)
 
 print(classification_report(data_unseen_target, predictions))
+print('LR unique predictions')
+print(set(predictions))
+## K-Nearest neighbours (KNN)
 
+from sklearn.neighbors import KNeighborsClassifier
+neigh = KNeighborsClassifier()
+neigh.fit(data, data_target)
+predictions = neigh.predict(data_unseen)
+print(classification_report(data_unseen_target, predictions))
+print('KNN unique predictions')
+print(set(predictions))
 # Testing
 path_data_test = path_pwd+'/'+'data_raw/test/'
 os.listdir(path_data_test)
@@ -103,18 +113,26 @@ df_customer_test = pd.read_excel(file_customer_test, engine='openpyxl')
 print(df_customer_test.shape)
 df_customer_test = df_customer_test.dropna() # Drop NaN and missing data rows
 print(df_customer_test.shape)
-
+df_ID = df_customer_test.ID
 df_customer_test = df_customer_test.drop(data_drop_list, axis=1)
 
 # Convert non-numeric to unique numerical values
 for key in list(column_mapped_dict.keys()):
-    print(key)
     if key in list(df_customer_test.keys()):
-        print(column_mapped_dict[key].keys())
-        print(column_mapped_dict[key].values())
         df_customer_test[key] = df_customer_test[key].replace(list(column_mapped_dict[key].keys()),list(column_mapped_dict[key].values()))
 
 predictions_test = clf.predict(df_customer_test)
+print(set(predictions_test))
+predictions_test = neigh.predict(df_customer_test)
+print(set(predictions_test))
+
+# Print Output
+dr = {'ID':df_ID.values,'Top-up Month':predictions_test}
+dr = pd.DataFrame(dr)
+
+dr['Top-up Month'] = dr['Top-up Month'].replace(list(column_mapped_dict['Top-up Month'].values()),list(column_mapped_dict['Top-up Month'].keys()))
+
+dr.to_csv('knn_data_train.csv', index=False)
 
 """
 
