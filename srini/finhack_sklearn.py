@@ -10,6 +10,8 @@ from sklearn.model_selection import train_test_split
 from sklearn.linear_model import LogisticRegression
 from sklearn.metrics import classification_report
 from sklearn.impute import SimpleImputer
+from sklearn.neighbors import KNeighborsClassifier
+from sklearn.ensemble import RandomForestClassifier
 
 # Functions
 
@@ -80,7 +82,7 @@ data, data_unseen, data_target, data_unseen_target =train_test_split(
     df_customer['Top-up Month'] ,test_size = 0.1, random_state=13)
 
 # Training
-
+"""
 ## Logistic Regression
 clf = LogisticRegression().fit(data, data_target)
 predictions = clf.predict(data_unseen)
@@ -88,15 +90,19 @@ predictions = clf.predict(data_unseen)
 print(classification_report(data_unseen_target, predictions))
 print('LR unique predictions')
 print(set(predictions))
-## K-Nearest neighbours (KNN)
 
-from sklearn.neighbors import KNeighborsClassifier
+## K-Nearest neighbours (KNN)
 neigh = KNeighborsClassifier()
 neigh.fit(data, data_target)
 predictions = neigh.predict(data_unseen)
 print(classification_report(data_unseen_target, predictions))
 print('KNN unique predictions')
 print(set(predictions))
+"""
+## Random Forest
+clf = RandomForestClassifier(random_state=0)
+clf.fit(data, data_target)
+
 # Testing
 path_data_test = path_pwd+'/'+'data_raw/test/'
 os.listdir(path_data_test)
@@ -129,10 +135,13 @@ imp = imp.fit(df_customer_test)
 # Impute our data, then train
 df_customer_test = imp.transform(df_customer_test)
 
+#predictions_test = clf.predict(df_customer_test)
+#print(set(predictions_test))
+#predictions_test = neigh.predict(df_customer_test)
+#print(set(predictions_test))
 predictions_test = clf.predict(df_customer_test)
 print(set(predictions_test))
-predictions_test = neigh.predict(df_customer_test)
-print(set(predictions_test))
+
 
 # Print Output
 dr = {'ID':df_ID.values,'Top-up Month':predictions_test}
@@ -140,7 +149,7 @@ dr = pd.DataFrame(dr)
 
 dr['Top-up Month'] = dr['Top-up Month'].replace(list(column_mapped_dict['Top-up Month'].values()),list(column_mapped_dict['Top-up Month'].keys()))
 
-dr.to_csv('knn_data_train.csv', index=False)
+dr.to_csv('rf_data_train.csv', index=False)
 
 """
 
