@@ -7,11 +7,14 @@ import pandas as pd
 import numpy as np
 # Sklearn modules
 from sklearn.model_selection import train_test_split
-from sklearn.linear_model import LogisticRegression
-from sklearn.metrics import classification_report
 from sklearn.impute import SimpleImputer
-from sklearn.neighbors import KNeighborsClassifier
-from sklearn.ensemble import RandomForestClassifier
+from sklearn.neural_network import MLPClassifier
+from sklearn.neural_network import MLPRegressor
+
+# Import necessary modules
+from sklearn.metrics import mean_squared_error
+from math import sqrt
+from sklearn.metrics import r2_score
 
 # Functions
 
@@ -82,26 +85,19 @@ data, data_unseen, data_target, data_unseen_target =train_test_split(
     df_customer['Top-up Month'] ,test_size = 0.1, random_state=13)
 
 # Training
-"""
-## Logistic Regression
-clf = LogisticRegression().fit(data, data_target)
-predictions = clf.predict(data_unseen)
+mlp = MLPClassifier(hidden_layer_sizes=(8,8,8), activation='relu', solver='adam', max_iter=500)
+mlp.fit(data, data_target)
 
-print(classification_report(data_unseen_target, predictions))
-print('LR unique predictions')
-print(set(predictions))
+predict_train = mlp.predict(data)
+predict_test = mlp.predict(data_unseen)
 
-## K-Nearest neighbours (KNN)
-neigh = KNeighborsClassifier()
-neigh.fit(data, data_target)
-predictions = neigh.predict(data_unseen)
-print(classification_report(data_unseen_target, predictions))
-print('KNN unique predictions')
-print(set(predictions))
-"""
-## Random Forest
-clf = RandomForestClassifier(random_state=0)
-clf.fit(data, data_target)
+from sklearn.metrics import classification_report,confusion_matrix
+print(confusion_matrix(data_target,predict_train))
+print(classification_report(data_target,predict_train))
+
+print('Test NN Status')
+print(confusion_matrix(data_target,predict_train))
+print(classification_report(data_target,predict_train))
 
 # Testing
 path_data_test = path_pwd+'/'+'data_raw/test/'
@@ -114,12 +110,9 @@ print('Customer file:', file_customer_test)
 
 ## Load customer trainig data
 df_customer_test = pd.read_excel(file_customer_test, engine='openpyxl')
-#df_customer_test.head()
 
 # Shape as data loaded
 print(df_customer_test.shape)
-#df_customer_test = df_customer_test.dropna() # Drop NaN and missing data rows
-#print(df_customer_test.shape)
 df_ID = df_customer_test.ID
 df_customer_test = df_customer_test.drop(data_drop_list, axis=1)
 
@@ -135,11 +128,7 @@ imp = imp.fit(df_customer_test)
 # Impute our data, then train
 df_customer_test = imp.transform(df_customer_test)
 
-#predictions_test = clf.predict(df_customer_test)
-#print(set(predictions_test))
-#predictions_test = neigh.predict(df_customer_test)
-#print(set(predictions_test))
-predictions_test = clf.predict(df_customer_test)
+predictions_test = mlp.predict(df_customer_test)
 print(set(predictions_test))
 
 
@@ -149,7 +138,7 @@ dr = pd.DataFrame(dr)
 
 dr['Top-up Month'] = dr['Top-up Month'].replace(list(column_mapped_dict['Top-up Month'].values()),list(column_mapped_dict['Top-up Month'].keys()))
 
-dr.to_csv('rf_data_train.csv', index=False)
+dr.to_csv('nn_data_train.csv', index=False)
 
 """
 

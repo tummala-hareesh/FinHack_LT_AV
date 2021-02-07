@@ -68,7 +68,7 @@ print(df_customer.shape)
 
 data_drop_list  = ['ID','BranchID', 'Area', 'DisbursalDate', 'MaturityDAte','AuthDate',
                 'AssetID', 'ManufacturerID', 'SupplierID',
-                'City', 'State', 'ZiPCODE']
+                'City', 'ZiPCODE']
 
 df_customer = df_customer.drop(data_drop_list, axis=1)
 
@@ -102,6 +102,19 @@ print(set(predictions))
 ## Random Forest
 clf = RandomForestClassifier(random_state=0)
 clf.fit(data, data_target)
+predictions = clf.predict(data_unseen)
+
+print(classification_report(data_unseen_target, predictions))
+print('RF unique predictions')
+print(set(predictions))
+
+from sklearn.ensemble import GradientBoostingClassifier
+clf = GradientBoostingClassifier(random_state=0)
+clf.fit(data, data_target)
+predictions = clf.predict(data_unseen)
+print(classification_report(data_unseen_target, predictions))
+print('RF unique predictions')
+print(set(predictions))
 
 # Testing
 path_data_test = path_pwd+'/'+'data_raw/test/'
@@ -139,14 +152,13 @@ df_customer_test = imp.transform(df_customer_test)
 predictions_test = clf.predict(df_customer_test)
 print(set(predictions_test))
 
-
 # Print Output
 dr = {'ID':df_ID.values,'Top-up Month':predictions_test}
 dr = pd.DataFrame(dr)
 
 dr['Top-up Month'] = dr['Top-up Month'].replace(list(column_mapped_dict['Top-up Month'].values()),list(column_mapped_dict['Top-up Month'].keys()))
 
-dr.to_csv('rf_data_train.csv', index=False)
+dr.to_csv('gbc_data_train.csv', index=False)
 
 """
 
