@@ -9,6 +9,7 @@ import numpy as np
 from sklearn.model_selection import train_test_split
 from sklearn.linear_model import LogisticRegression
 from sklearn.metrics import classification_report
+from sklearn.impute import SimpleImputer
 
 # Functions
 
@@ -111,8 +112,8 @@ df_customer_test = pd.read_excel(file_customer_test, engine='openpyxl')
 
 # Shape as data loaded
 print(df_customer_test.shape)
-df_customer_test = df_customer_test.dropna() # Drop NaN and missing data rows
-print(df_customer_test.shape)
+#df_customer_test = df_customer_test.dropna() # Drop NaN and missing data rows
+#print(df_customer_test.shape)
 df_ID = df_customer_test.ID
 df_customer_test = df_customer_test.drop(data_drop_list, axis=1)
 
@@ -120,6 +121,13 @@ df_customer_test = df_customer_test.drop(data_drop_list, axis=1)
 for key in list(column_mapped_dict.keys()):
     if key in list(df_customer_test.keys()):
         df_customer_test[key] = df_customer_test[key].replace(list(column_mapped_dict[key].keys()),list(column_mapped_dict[key].values()))
+
+# To replace NaN with completing missing values
+imp = SimpleImputer(missing_values=np.nan, strategy='most_frequent')
+imp = imp.fit(df_customer_test)
+
+# Impute our data, then train
+df_customer_test = imp.transform(df_customer_test)
 
 predictions_test = clf.predict(df_customer_test)
 print(set(predictions_test))
